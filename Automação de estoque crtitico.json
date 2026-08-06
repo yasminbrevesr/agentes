@@ -1,0 +1,194 @@
+{
+  "name": "Automação de estoque crtitico",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        -48
+      ],
+      "id": "823349aa-4f7f-4b82-b2cd-56c8d598c110",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16iEjxug6h-vXqB47Yi0LKgx_BC32NxLCs4iCTliqiB8/edit?gid=1212985584#gid=1212985584",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1212985584,
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16iEjxug6h-vXqB47Yi0LKgx_BC32NxLCs4iCTliqiB8/edit#gid=1212985584"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        48,
+        -256
+      ],
+      "id": "2f253202-f7e1-4dba-aaa9-4ba6a23b4b81",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QutCMxsPMeVlo777",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4690e38a-e101-4d57-a392-a8d20baa7d3d",
+              "leftValue": "={{ $json.ESTOQUE_ATUAL }}",
+              "rightValue": "={{ $json.ESTOQUE_MINIMO }}",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        48
+      ],
+      "id": "39cea6d7-d4e4-47b2-9139-c870e9cb8920",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        -96
+      ],
+      "id": "5cb9a5de-31db-40cd-96a5-82c856304dfc",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "sendTo": "brxvesyasmin@gmail.com",
+        "subject": "Itens com Estoque insuficiente!",
+        "message": "Atenção, itens abaixo do estoque minimo. Favor, solicitar urgência ao forncedor, obrigada. Atenciosamente, Yasmin.",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        80
+      ],
+      "id": "49a21cb5-a835-436d-935c-d8c8532363ec",
+      "name": "Send a message",
+      "webhookId": "abfa0803-ac07-41ae-a26e-d7af57721021",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Na7ngPsDuqO9c4BO",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "931cdcc2-d435-476b-88c6-daf636c69626",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "521294b72fa5ef7ecdd54f7d8782e60da589e1cd18e3845a00c4f51a92587cbb"
+  },
+  "nodeGroups": [],
+  "id": "n1KydzS9481jlZZ8",
+  "tags": []
+}
